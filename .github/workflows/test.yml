@@ -11,6 +11,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Mínimo privilegio: este workflow solo lee el repositorio.
+permissions:
+  contents: read
+
 jobs:
   cask:
     strategy:
