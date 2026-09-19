@@ -24,7 +24,10 @@ cask "dbv-typst-editor" do
 
     url "https://github.com/davidbuenov/dbv-typst-editor/releases/download/v#{version}/DBV.Typst.Editor_#{version}_amd64.AppImage"
 
-    app_image "DBV.Typst.Editor_#{version}_amd64.AppImage"
+    # Destino sin versión: así el propio actualizador o `brew upgrade` lo
+    # sobrescriben en su sitio en vez de dejar un enlace por cada versión.
+    app_image "DBV.Typst.Editor_#{version}_amd64.AppImage",
+              target: "DBV-Typst-Editor.AppImage"
 
     zap trash: [
       "~/.cache/com.davidbuenov.dbv-typst-editor",

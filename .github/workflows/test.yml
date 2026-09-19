@@ -27,7 +27,12 @@ jobs:
 
       - name: Registrar este repositorio como tap
         run: |
-          brew tap davidbuenov/dbv-typst-editor "$GITHUB_WORKSPACE"
+          # `brew tap <user/repo> <ruta>` espera una URL remota y falla con una
+          # ruta local; se copia el repo al directorio de taps, que Homebrew
+          # reconoce igual y prueba exactamente lo que hay en este commit.
+          TAP_DIR="$(brew --repository)/Library/Taps/davidbuenov/homebrew-dbv-typst-editor"
+          mkdir -p "$(dirname "$TAP_DIR")"
+          cp -R "$GITHUB_WORKSPACE" "$TAP_DIR"
 
       - name: Auditar el Cask
         run: brew audit --cask --online davidbuenov/dbv-typst-editor/dbv-typst-editor
