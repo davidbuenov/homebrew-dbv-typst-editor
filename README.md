@@ -14,6 +14,17 @@ brew install --cask dbv-typst-editor
 - **macOS** (Intel and Apple Silicon): installs `DBV Typst Editor.app` in `/Applications`. The app is not yet signed or notarised by Apple, so Gatekeeper asks for confirmation the first time (right-click → Open).
 - **Linux** (x86_64): links the `.AppImage` into Homebrew's AppImage directory. Requires Homebrew 6.0.0 or later, which added AppImage casks, and FUSE 2 to run AppImages (`libfuse2` on Debian/Ubuntu).
 
+## Command line
+
+The Cask also installs a `typs` command:
+
+```sh
+typs                 # open the app
+typs report.typ      # open a document
+typs thesis/         # open a folder as a project
+typs .               # open the current folder
+```
+
 ## Update
 
 The Cask is updated automatically by CI in the main repository whenever a new Release is published.
