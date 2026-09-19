@@ -53,5 +53,20 @@ jobs:
       - name: Instalar el Cask
         run: brew install --cask davidbuenov/dbv-typst-editor/dbv-typst-editor
 
+      - name: Comprobar el comando typs
+        run: |
+          TYPS="$(brew --prefix)/bin/typs"
+          test -x "$TYPS"
+          echo "--- contenido de typs:"; cat "$TYPS"
+          # El script debe llamar a la aplicación de verdad en cada plataforma.
+          if [ "$RUNNER_OS" = macOS ]; then
+            grep -q 'open -a "DBV Typst Editor"' "$TYPS"
+          else
+            grep -q 'nohup' "$TYPS"
+          fi
+
       - name: Desinstalar el Cask
         run: brew uninstall --cask davidbuenov/dbv-typst-editor/dbv-typst-editor
+
+      - name: Comprobar que desinstalar retira el comando typs
+        run: test ! -e "$(brew --prefix)/bin/typs"

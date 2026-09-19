@@ -8,6 +8,19 @@ cask "dbv-typst-editor" do
 
     app "DBV Typst Editor.app"
 
+    # Comando `typs` para quien vive en la consola: `typs`, `typs fichero.typ`,
+    # `typs carpeta/`. `open -a` devuelve el control al terminal en cuanto se
+    # abre la ventana (lanzar el ejecutable interno lo dejaría bloqueado).
+    preflight do
+      File.write("#{staged_path}/typs", <<~SH)
+        #!/bin/sh
+        exec open -a "DBV Typst Editor" "$@"
+      SH
+      FileUtils.chmod 0755, "#{staged_path}/typs"
+    end
+
+    binary "#{staged_path}/typs"
+
     zap trash: [
       "~/Library/Application Support/com.davidbuenov.dbv-typst-editor",
       "~/Library/Caches/com.davidbuenov.dbv-typst-editor",
@@ -28,6 +41,21 @@ cask "dbv-typst-editor" do
     # sobrescriben en su sitio en vez de dejar un enlace por cada versión.
     app_image "DBV.Typst.Editor_#{version}_amd64.AppImage",
               target: "DBV-Typst-Editor.AppImage"
+
+    # Comando `typs` (ver el bloque de macOS). Lanza el AppImage en segundo plano
+    # para liberar el terminal; la aplicación resuelve las rutas relativas contra
+    # el directorio de quien la invoca, así que no hace falta absolutizarlas aquí.
+    preflight do
+      appimage = "#{staged_path}/DBV.Typst.Editor_#{version}_amd64.AppImage"
+      FileUtils.chmod 0755, appimage
+      File.write("#{staged_path}/typs", <<~SH)
+        #!/bin/sh
+        nohup "#{appimage}" "$@" >/dev/null 2>&1 &
+      SH
+      FileUtils.chmod 0755, "#{staged_path}/typs"
+    end
+
+    binary "#{staged_path}/typs"
 
     zap trash: [
       "~/.cache/com.davidbuenov.dbv-typst-editor",
