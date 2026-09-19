@@ -1,0 +1,39 @@
+name: Test Cask
+
+# Comprueba el Cask de verdad en las dos plataformas: auditoría e instalación.
+# Homebrew no se puede ejecutar en Windows, así que esta es la única forma de
+# validar la sintaxis de los bloques on_macos / on_linux antes de que llegue a
+# un usuario.
+
+on:
+  push:
+    paths: [Casks/**, .github/workflows/test.yml]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  cask:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Instalar Homebrew (Linux)
+        if: runner.os == 'Linux'
+        uses: Homebrew/actions/setup-homebrew@main
+
+      - name: Registrar este repositorio como tap
+        run: |
+          brew tap davidbuenov/dbv-typst-editor "$GITHUB_WORKSPACE"
+
+      - name: Auditar el Cask
+        run: brew audit --cask --online davidbuenov/dbv-typst-editor/dbv-typst-editor
+
+      - name: Instalar el Cask
+        run: brew install --cask davidbuenov/dbv-typst-editor/dbv-typst-editor
+
+      - name: Desinstalar el Cask
+        run: brew uninstall --cask davidbuenov/dbv-typst-editor/dbv-typst-editor
