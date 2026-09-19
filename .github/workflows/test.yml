@@ -18,6 +18,10 @@ jobs:
       matrix:
         os: [macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
+    env:
+      # Sin token, `brew audit --online` agota el límite de la API de GitHub
+      # (las IP de los runners son compartidas) y falla sin auditar nada.
+      HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v5
 
@@ -28,11 +32,16 @@ jobs:
       - name: Registrar este repositorio como tap
         run: |
           # `brew tap <user/repo> <ruta>` espera una URL remota y falla con una
-          # ruta local; se copia el repo al directorio de taps, que Homebrew
-          # reconoce igual y prueba exactamente lo que hay en este commit.
+          # ruta local, así que se copia el repo al directorio de taps, que
+          # Homebrew reconoce igual y prueba exactamente lo que hay en este
+          # commit. En Linux, `setup-homebrew` ya registra el repo actual: si el
+          # directorio existe, no hay nada que hacer.
           TAP_DIR="$(brew --repository)/Library/Taps/davidbuenov/homebrew-dbv-typst-editor"
-          mkdir -p "$(dirname "$TAP_DIR")"
-          cp -R "$GITHUB_WORKSPACE" "$TAP_DIR"
+          if [ ! -d "$TAP_DIR" ]; then
+            mkdir -p "$TAP_DIR"
+            cp -R "$GITHUB_WORKSPACE/." "$TAP_DIR/"
+          fi
+          brew tap
 
       - name: Auditar el Cask
         run: brew audit --cask --online davidbuenov/dbv-typst-editor/dbv-typst-editor
