@@ -33,7 +33,7 @@ cask "dbv-typst-editor" do
     # El único AppImage que publica el proyecto es x86_64.
     depends_on arch: :x86_64
 
-    sha256 "9599458acb0f63768e180741b91f303c53f831645eca1d11ae61aec91538918c"
+    sha256 "8ab2716f3b322c0791c4098bdb1c9524ceca4a087e19ffac739216033cf09e41"
 
     url "https://github.com/davidbuenov/dbv-typst-editor/releases/download/v#{version}/DBV.Typst.Editor_#{version}_amd64.AppImage"
 
