@@ -50,8 +50,15 @@ jobs:
       - name: Auditar el Cask
         run: brew audit --cask --online davidbuenov/dbv-typst-editor/dbv-typst-editor
 
-      - name: Instalar el Cask
-        run: brew install --cask davidbuenov/dbv-typst-editor/dbv-typst-editor
+      - name: Instalar el Cask (sin avisos de obsolescencia)
+        run: |
+          # Homebrew avisa a los usuarios de sintaxis obsoleta del Cask (así se
+          # detectó `preflight` en Homebrew 7): que el CI lo vea antes que ellos.
+          brew install --cask davidbuenov/dbv-typst-editor/dbv-typst-editor 2>&1 | tee install.log
+          if grep -qi "deprecated" install.log; then
+            echo "::error::Homebrew avisa de sintaxis obsoleta en el Cask" >&2
+            exit 1
+          fi
 
       - name: Comprobar el comando typs
         run: |
@@ -63,6 +70,8 @@ jobs:
             grep -q 'open -a "DBV Typst Editor"' "$TYPS"
           else
             grep -q 'nohup' "$TYPS"
+            # El AppImage al que apunta `typs` existe y es ejecutable.
+            test -x "$HOME/Applications/DBV-Typst-Editor.AppImage"
           fi
 
       - name: Desinstalar el Cask
