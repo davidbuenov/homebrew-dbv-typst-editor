@@ -11,15 +11,12 @@ cask "dbv-typst-editor" do
     # Comando `typs` para quien vive en la consola: `typs`, `typs fichero.typ`,
     # `typs carpeta/`. `open -a` devuelve el control al terminal en cuanto se
     # abre la ventana (lanzar el ejecutable interno lo dejaría bloqueado).
-    preflight do
-      File.write("#{staged_path}/typs", <<~SH)
-        #!/bin/sh
-        exec open -a "DBV Typst Editor" "$@"
-      SH
-      FileUtils.chmod 0755, "#{staged_path}/typs"
-    end
-
-    binary "#{staged_path}/typs"
+    # `command_wrapper` escribe el script y lo enlaza como `binary`; sustituye al
+    # bloque `preflight`, obsoleto desde Homebrew 7.
+    command_wrapper "typs", content: <<~SH
+      #!/bin/sh
+      exec open -a "DBV Typst Editor" "$@"
+    SH
 
     zap trash: [
       "~/Library/Application Support/com.davidbuenov.dbv-typst-editor",
@@ -45,17 +42,19 @@ cask "dbv-typst-editor" do
     # Comando `typs` (ver el bloque de macOS). Lanza el AppImage en segundo plano
     # para liberar el terminal; la aplicación resuelve las rutas relativas contra
     # el directorio de quien la invoca, así que no hace falta absolutizarlas aquí.
-    preflight do
-      appimage = "#{staged_path}/DBV.Typst.Editor_#{version}_amd64.AppImage"
-      FileUtils.chmod 0755, appimage
-      File.write("#{staged_path}/typs", <<~SH)
-        #!/bin/sh
-        nohup "#{appimage}" "$@" >/dev/null 2>&1 &
-      SH
-      FileUtils.chmod 0755, "#{staged_path}/typs"
-    end
-
-    binary "#{staged_path}/typs"
+    # Desde Homebrew 7, `app_image` MUEVE el AppImage a `appimagedir` (por
+    # defecto ~/Applications) y le da permiso de ejecución él mismo: el script
+    # apunta allí, no a `staged_path`. El DSL no expone `appimagedir`, así que se
+    # usa el valor por defecto y, si no está, se dice con claridad.
+    command_wrapper "typs", content: <<~SH
+      #!/bin/sh
+      APPIMAGE="$HOME/Applications/DBV-Typst-Editor.AppImage"
+      if [ ! -x "$APPIMAGE" ]; then
+        echo "typs: $APPIMAGE not found (installed with a custom --appimagedir?)" >&2
+        exit 1
+      fi
+      nohup "$APPIMAGE" "$@" >/dev/null 2>&1 &
+    SH
 
     zap trash: [
       "~/.cache/com.davidbuenov.dbv-typst-editor",
