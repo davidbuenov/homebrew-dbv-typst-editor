@@ -1,8 +1,8 @@
 cask "dbv-typst-editor" do
-  version "0.13.0"
+  version "0.13.1"
 
   on_macos do
-    sha256 "c7dce1329378365f66425da881aa891acaf42bd55bcd1b1301f26187e1ef3acb"
+    sha256 "b18055c41c782fa5f3b0bb47039a882390470b6f3506ac83e49ad13956028e53"
 
     url "https://github.com/davidbuenov/dbv-typst-editor/releases/download/v#{version}/DBV.Typst.Editor_#{version}_universal.dmg"
 
@@ -30,7 +30,7 @@ cask "dbv-typst-editor" do
     # El único AppImage que publica el proyecto es x86_64.
     depends_on arch: :x86_64
 
-    sha256 "6b744d85bb1a8c9f9d2c5454f8b608480407721ebf01bb8a9c162838f068db2e"
+    sha256 "acb4e10891b39388e62dcd7b0bf7a9031aa2deb6068444d905a9369763f0f92d"
 
     url "https://github.com/davidbuenov/dbv-typst-editor/releases/download/v#{version}/DBV.Typst.Editor_#{version}_amd64.AppImage"
 
