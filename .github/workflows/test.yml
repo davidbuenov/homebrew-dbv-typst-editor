@@ -46,6 +46,8 @@ jobs:
             cp -R "$GITHUB_WORKSPACE/." "$TAP_DIR/"
           fi
           brew tap
+          # Homebrew recientes exigen confiar explícitamente en taps de terceros antes de cargar casks.
+          brew trust davidbuenov/dbv-typst-editor || true
 
       - name: Auditar el Cask
         run: brew audit --cask --online davidbuenov/dbv-typst-editor/dbv-typst-editor
